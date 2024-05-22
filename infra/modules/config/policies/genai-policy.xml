@@ -1,0 +1,27 @@
+<policies>
+    <inbound>
+        <set-backend-service id="apim-generated-policy" backend-id="aoai-lb-pool" />
+        <azure-openai-token-limit tokens-per-minute="10000" counter-key="@(context.Subscription.Id)" estimate-prompt-tokens="true" tokens-consumed-header-name="consumed-tokens" remaining-tokens-header-name="remaining-tokens" />
+        <authentication-managed-identity resource="https://cognitiveservices.azure.com" output-token-variable-name="msi-access-token" client-id="{{apim-identity}}" ignore-error="false" />
+        <set-header name="Authorization" exists-action="override">
+            <value>@("Bearer " + (string)context.Variables["msi-access-token"])</value>
+        </set-header>        
+        <azure-openai-emit-token-metric namespace="genaitest">
+            <dimension name="Subscription ID" />
+            <dimension name="Client IP" value="@(context.Request.IpAddress)" />
+        </azure-openai-emit-token-metric>
+        <base />
+    </inbound>
+    <backend>
+        <retry condition="@(context.Response.StatusCode == 429)" count="2" interval="1" first-fast-retry="true">
+            <set-backend-service id="apim-generated-policy" backend-id="aoai-lb-pool" />
+            <forward-request buffer-request-body="true" />
+        </retry>
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
