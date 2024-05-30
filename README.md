@@ -40,3 +40,18 @@ Deploy the template to the Azure subscription using the following command:
     - Metric blade -> select *genaitest* in the *Metric Namespace* dropdown
     - Logs blade -> Tables -> customMetrics has the custom metrics emitted by the APIM policies. customDimensions field contains the dimension which can be used to aggregate the metrics.
 1. Update the azure-openai-token-limit policy for the API to use 100 as the tokens-per-minute and the second request should return a 429 response which is issued by APIM,
+
+## Streaming
+
+For metric collection with streaming, follow the below instructions:
+
+1. Change the buffering property on the forward-request policy as mentioned below
+   
+   ```yaml
+   <forward-request buffer-response="false" />
+   ```
+2. Use the curl command below to test streaming
+
+   ```bash
+   curl -N https://{yourapimname}.azure-api.net/openai/deployments/chat/chat/completions?api-version=2024-02-01 -H "Content-Type: application/json" -H "ocp-apim-subscription-key: {yoursubscriptionkey}" -d "{\"temperature\":1,\"top_p\":1,\"stream\":true,\"stop\":null,\"max_tokens\":2000,\"presence_penalty\":0,\"frequency_penalty\":0,\"logit_bias\":{},\"user\":\"user-1234\",\"messages\": [{\"role\":\"system\",\"content\":\"You are an AI assistant that helps people find information\"},{\"role\":\"user\",\"content\":\"Write a 10 page story on greek mythology.\"}],\"n\":1}"
+   ```
