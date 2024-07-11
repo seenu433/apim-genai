@@ -20,6 +20,7 @@ APIM GenAI capabilities demonstrated in this repository include:
 Deploy the template to the Azure subscription using the following command:
 
 ```bash
+    cd infra
     az deployment sub create --name apim-genai --template-file main.bicep --parameters parameters.json --location francecentral
 ```
 
@@ -31,9 +32,11 @@ Deploy the template to the Azure subscription using the following command:
     - deployment-id: chat
     - api-version: 2024-02-01
 1. Overwrite the *Request body* with the below
+
     ```json
-    {"temperature":1,"top_p":1,"stream":false,"stop":null,"max_tokens":2000,"presence_penalty":0,"frequency_penalty":0,"logit_bias":{},"user":"user-1234","messages": [{"role":"system","content":"You are an AI assistant that helps people find information"},{"role":"user","content":"Negate the following sentence.The price for bubblegum increased on thursday."}],"n":1}
+    {"temperature":1,"top_p":1,"stream":false,"stop":null,"max_tokens":500,"presence_penalty":0,"frequency_penalty":0,"logit_bias":{},"user":"user-1234","messages": [{"role":"system","content":"You are an AI assistant that helps people find information"},{"role":"user","content":"Negate the following sentence.The price for bubblegum increased on thursday."}],"n":1}
     ```
+
 1. Click send and observe the response
     - x-ms-region changing to the region of AOAI service that served the request
 1. Metrics can be observed in the Application Insights instance created in the same resource group as the APIM instance.
